@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Observable URL Builder</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+    }
+
+    .box {
+      width: min(700px, 90vw);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 1px solid #444;
+      border-radius: 10px;
+      background: #1b1b1b;
+      color: white;
+      text-align: center;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      padding: 12px 18px;
+      font-size: 16px;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .create {
+      background: #6ea8fe;
+      color: #08111f;
+      font-weight: bold;
+    }
+
+    .copy {
+      background: #333;
+      color: white;
+    }
+
+    .result {
+      width: 100%;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      border: 1px solid #444;
+      border-radius: 10px;
+      background: #1b1b1b;
+      word-break: break-all;
+      text-align: center;
+    }
+
+    .message {
+      min-height: 20px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Create an URL to "embed" in Pitch.com</h1>
+    <h3>Target URL (github pages)</h3>
+    <input
+      id="targetUrl"
+      type="text"
+      placeholder="Target URL to embed inside Observable"
+      value="https://olaatkongotec.github.io/website/"
+    />
+
+    <div class="buttons">
+      <button class="create" id="createButton">Create</button>
+      <button class="copy" id="copyButton">Copy</button>
+    </div>
+    <h3>Embed URL</h3>
+    <div class="result" id="result"></div>
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    const observableBaseUrl = "https://observablehq.com/embed/72dd2778877a4ac8?cells=embeddedPage";
+
+    const targetUrlElement = document.getElementById("targetUrl");
+    const resultElement = document.getElementById("result");
+    const messageElement = document.getElementById("message");
+
+    function createUrl() {
+      messageElement.textContent = "";
+
+      try {
+        const targetUrl = new URL(targetUrlElement.value.trim());
+        const finalUrl = new URL(observableBaseUrl);
+        finalUrl.searchParams.set("url", targetUrl.toString());
+        resultElement.textContent = finalUrl.toString();
+      } catch (error) {
+        resultElement.textContent = "";
+        messageElement.textContent = "Enter a valid URL.";
+      }
+    }
+
+    document.getElementById("createButton").addEventListener("click", createUrl);
+
+    document.getElementById("copyButton").addEventListener("click", async function () {
+      const textToCopy = resultElement.textContent.trim();
+      if (!textToCopy) return;
+
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+        messageElement.textContent = "Copied.";
+      } catch (error) {
+        messageElement.textContent = "Could not copy.";
+      }
+    });
+
+    createUrl();
+  </script>
+</body>
+</html>
